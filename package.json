@@ -1,5 +1,14 @@
 {
+  "name": "todolist",
+  "version": "1.0.0",
+  "type": "commonjs",
   "dependencies": {
-    "mysql2": "^3.14.0"
+    "node-telegram-bot-api": "^0.61.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "mysql2": "^3.14.1"
   }
 }
