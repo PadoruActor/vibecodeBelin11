@@ -75,38 +75,40 @@
         }
     }
 
-    async function addItem() {
+    function addItem() {
+        // Keep the original client-side only add functionality
         const newItemInput = document.getElementById('newItem');
         const newItemText = newItemInput.value.trim();
 
         if (newItemText) {
-            try {
-                const response = await fetch('/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ text: newItemText })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    newItemInput.value = '';
-                    await renderList();
-                }
-            } catch (error) {
-                console.error('Error adding item:', error);
-            }
+            items.push({ id: nextId++, text: newItemText });
+            newItemInput.value = '';
+            renderList();
         }
     }
 
-    async function removeItem(index) {
-        // We'll implement this later
-        console.log('Remove item at index:', index);
+    async function removeItem(id) {
+        try {
+            const response = await fetch('/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: id })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                await renderList();
+            }
+        } catch (error) {
+            console.error('Error removing item:', error);
+        }
     }
 
-    // Initial render
-    document.addEventListener('DOMContentLoaded', renderList);
+    // Update the template in getHtmlRows() in index.js to include the ID in the remove button:
+    // Change this line in getHtmlRows():
+    // <td><button class="delete-btn" onclick="removeItem(${item.id})">×</button></td>
 </script>
 
 </body>

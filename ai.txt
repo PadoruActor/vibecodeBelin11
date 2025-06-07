@@ -1,2 +1,5 @@
-There's files :
-I need to add feature : add new element to list and create a new branch with this feature. Give me exact code to do this and git commands i need to follow
+Hey
+Now i need to make another branch FROM starting code with another feature (!there's should be only 1 feature for each branch)
+This feature is removing element from list
+And i need to share this other branch in same repo
+How can i do it?
