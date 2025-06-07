@@ -47,14 +47,16 @@ async function getHtmlRows() {
 
     const todoItems = await retrieveListItems();
 
-    // Generate HTML for each item
-    return todoItems.map(item => `
-        <tr>
-            <td>${item.id}</td>
-            <td>${item.text}</td>
-            <td><button class="delete-btn">×</button></td>
-        </tr>
-    `).join('');
+    // Generate HTML for each itemreturn todoItems.map(item => `
+    <tr>
+        <td>${item.id}</td>
+        <td class="item-text" data-id="${item.id}">${item.text}</td>
+        <td>
+            <button class="edit-btn" data-id="${item.id}">Edit</button>
+            <button class="delete-btn">×</button>
+        </td>
+    </tr>
+`).join('');
 }
 
 // Modified request handler with template replacement
@@ -76,25 +78,24 @@ async function handleRequest(req, res) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end('Error loading index.html');
         }
-    }else if (req.url === '/delete' && req.method === 'POST') {
+    }else if (req.url === '/update' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => {
         body += chunk.toString();
     });
     req.on('end', async () => {
         try {
-            const { id } = JSON.parse(body);
-            await deleteListItem(id);
+            const { id, text } = JSON.parse(body);
+            await updateListItem(id, text);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ success: true }));
         } catch (error) {
             console.error(error);
             res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ success: false, error: 'Failed to delete item' }));
+            res.end(JSON.stringify({ success: false, error: 'Failed to update item' }));
         }
     });
-}
- else {
+} else {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Route not found');
     }
@@ -121,6 +122,17 @@ async function deleteListItem(id) {
         return true;
     } catch (error) {
         console.error('Error deleting list item:', error);
+        throw error;
+    }
+}async function updateListItem(id, newText) {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const query = 'UPDATE items SET text = ? WHERE id = ?';
+        await connection.execute(query, [newText, id]);
+        await connection.end();
+        return true;
+    } catch (error) {
+        console.error('Error updating list item:', error);
         throw error;
     }
 }

@@ -1,5 +1,1 @@
-Hey
-Now i need to make another branch FROM starting code with another feature (!there's should be only 1 feature for each branch)
-This feature is removing element from list
-And i need to share this other branch in same repo
-How can i do it?
+And i need to make another branch: now this feature is should help me changing the elements

@@ -65,50 +65,51 @@
 </div>
 
 <script>
+    // Add this to your existing script
+    function setupEditHandlers() {
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', async function() {
+                const id = this.getAttribute('data-id');
+                const textCell = document.querySelector(`.item-text[data-id="${id}"]`);
+                const currentText = textCell.textContent;
+
+                const newText = prompt('Edit item:', currentText);
+                if (newText && newText !== currentText) {
+                    try {
+                        const response = await fetch('/update', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ id: id, text: newText })
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            await renderList();
+                        }
+                    } catch (error) {
+                        console.error('Error updating item:', error);
+                    }
+                }
+            });
+        });
+    }
+
+    // Modify your existing renderList function
     async function renderList() {
         try {
             const response = await fetch('/');
             const html = await response.text();
             document.body.innerHTML = html;
+            setupEditHandlers(); // Set up event listeners after rendering
         } catch (error) {
             console.error('Error loading list:', error);
         }
     }
 
-    function addItem() {
-        // Keep the original client-side only add functionality
-        const newItemInput = document.getElementById('newItem');
-        const newItemText = newItemInput.value.trim();
-
-        if (newItemText) {
-            items.push({ id: nextId++, text: newItemText });
-            newItemInput.value = '';
-            renderList();
-        }
-    }
-
-    async function removeItem(id) {
-        try {
-            const response = await fetch('/delete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id: id })
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                await renderList();
-            }
-        } catch (error) {
-            console.error('Error removing item:', error);
-        }
-    }
-
-    // Update the template in getHtmlRows() in index.js to include the ID in the remove button:
-    // Change this line in getHtmlRows():
-    // <td><button class="delete-btn" onclick="removeItem(${item.id})">×</button></td>
+    // Initial render
+    document.addEventListener('DOMContentLoaded', renderList);
 </script>
 
 </body>
