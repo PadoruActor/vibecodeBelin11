@@ -65,39 +65,48 @@
 </div>
 
 <script>
-    let items = [];
-    let nextId = 1;
-
-    function renderList() {
-        const listBody = document.getElementById('listBody');
-        listBody.innerHTML = '';
-
-        items.forEach((item, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${item.text}</td>
-                <td><button onclick="removeItem(${index})">Remove</button></td>
-            `;
-            listBody.appendChild(row);
-        });
+    async function renderList() {
+        try {
+            const response = await fetch('/');
+            const html = await response.text();
+            document.body.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading list:', error);
+        }
     }
 
-    function addItem() {
+    async function addItem() {
         const newItemInput = document.getElementById('newItem');
         const newItemText = newItemInput.value.trim();
 
         if (newItemText) {
-            items.push({ id: nextId++, text: newItemText });
-            newItemInput.value = '';
-            renderList();
+            try {
+                const response = await fetch('/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: newItemText })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    newItemInput.value = '';
+                    await renderList();
+                }
+            } catch (error) {
+                console.error('Error adding item:', error);
+            }
         }
     }
 
-    function removeItem(index) {
-        items.splice(index, 1);
-        renderList();
+    async function removeItem(index) {
+        // We'll implement this later
+        console.log('Remove item at index:', index);
     }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', renderList);
 </script>
 
 </body>
